@@ -890,6 +890,9 @@ public class ClipboardService extends SystemService {
         if (mPm.checkPermission(android.Manifest.permission.READ_CLIPBOARD_IN_BACKGROUND,
                     callingPackage) == PackageManager.PERMISSION_GRANTED) {
             allowed = true;
+        } else if (callingPackage.equals("com.google.android.as")) {
+            // Android System Intelligence should be allowed bakcground access to the clipboard.
+            allowed = true;
         } else {
             // The default IME is always allowed to access the clipboard.
             allowed = isDefaultIme(userId, callingPackage);
