@@ -111,7 +111,8 @@ public class BackupEligibilityRules {
      * </ol>
      *
      * However, the above eligibility rules are ignored for non-system apps in in case of
-     * device-to-device migration, see {@link OperationType}.
+     * device-to-device migration and the manifest rule outside of ADB Backup,
+     * see {@link OperationType}.
      */
     @VisibleForTesting
     public boolean appIsEligibleForBackup(ApplicationInfo app) {
@@ -150,7 +151,7 @@ public class BackupEligibilityRules {
     }
 
     /**
-    * Check if this app allows backup. Apps can opt out of backup by stating
+    * Check if this app allows backup. Apps can opt out of ADB Backup by stating
     * android:allowBackup="false" in their manifest. However, this flag is ignored for non-system
     * apps during device-to-device migrations, see {@link OperationType}.
     *
@@ -207,7 +208,8 @@ public class BackupEligibilityRules {
                     return isDebuggable;
                 }
             case OperationType.BACKUP:
-                return allowBackup;
+                // Allow all applications to be backed up by the system backup provider.
+                return true;
             default:
                 Slog.w(TAG, "Unknown operation type:" + mOperationType);
                 return false;

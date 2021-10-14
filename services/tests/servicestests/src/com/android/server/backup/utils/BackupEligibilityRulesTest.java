@@ -83,7 +83,7 @@ public class BackupEligibilityRulesTest {
     }
 
     @Test
-    public void appIsEligibleForBackup_backupNotAllowed_returnsFalse() throws Exception {
+    public void appIsEligibleForBackup_backupNotAllowed_returnsTrue() throws Exception {
         ApplicationInfo applicationInfo = new ApplicationInfo();
         applicationInfo.flags = 0;
         applicationInfo.uid = Process.FIRST_APPLICATION_UID;
@@ -92,7 +92,7 @@ public class BackupEligibilityRulesTest {
 
         boolean isEligible = mBackupEligibilityRules.appIsEligibleForBackup(applicationInfo);
 
-        assertThat(isEligible).isFalse();
+        assertThat(isEligible).isTrue();
     }
 
     @Test

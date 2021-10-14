@@ -148,34 +148,26 @@ public class RestoreUtils {
                     try {
                         PackageInfo pkg = packageManager.getPackageInfoAsUser(info.packageName,
                                 PackageManager.GET_SIGNING_CERTIFICATES, userId);
-                        if ((pkg.applicationInfo.flags & ApplicationInfo.FLAG_ALLOW_BACKUP)
-                                == 0) {
-                            Slog.w(TAG, "Restore stream contains apk of package "
-                                    + info.packageName
-                                    + " but it disallows backup/restore");
-                            okay = false;
-                        } else {
-                            // So far so good -- do the signatures match the manifest?
-                            Signature[] sigs = manifestSignatures.get(info.packageName);
-                            PackageManagerInternal pmi = LocalServices.getService(
-                                    PackageManagerInternal.class);
-                            BackupEligibilityRules eligibilityRules =
-                                    BackupEligibilityRules.forBackup(packageManager, pmi, userId);
-                            if (eligibilityRules.signaturesMatch(sigs, pkg)) {
-                                // If this is a system-uid app without a declared backup agent,
-                                // don't restore any of the file data.
-                                if (UserHandle.isCore(pkg.applicationInfo.uid)
-                                        && (pkg.applicationInfo.backupAgentName == null)) {
-                                    Slog.w(TAG, "Installed app " + info.packageName
-                                            + " has restricted uid and no agent");
-                                    okay = false;
-                                }
-                            } else {
+                        // So far so good -- do the signatures match the manifest?
+                        Signature[] sigs = manifestSignatures.get(info.packageName);
+                        PackageManagerInternal pmi = LocalServices.getService(
+                                PackageManagerInternal.class);
+                        BackupEligibilityRules eligibilityRules =
+                                BackupEligibilityRules.forBackup(packageManager, pmi, userId);
+                        if (eligibilityRules.signaturesMatch(sigs, pkg)) {
+                            // If this is a system-uid app without a declared backup agent,
+                            // don't restore any of the file data.
+                            if (UserHandle.isCore(pkg.applicationInfo.uid)
+                                    && (pkg.applicationInfo.backupAgentName == null)) {
                                 Slog.w(TAG, "Installed app " + info.packageName
-                                        + " signatures do not match restore manifest");
+                                        + " has restricted uid and no agent");
                                 okay = false;
-                                uninstall = true;
                             }
+                        } else {
+                            Slog.w(TAG, "Installed app " + info.packageName
+                                    + " signatures do not match restore manifest");
+                            okay = false;
+                            uninstall = true;
                         }
                     } catch (PackageManager.NameNotFoundException e) {
                         Slog.w(TAG, "Install of package " + info.packageName
